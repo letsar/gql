@@ -255,9 +255,6 @@ abstract class GGetBooksData_books__base_author__asPerson
         GGetBooksData_books_author,
         GBookFragment_author,
         GAuthorFragment,
-        GGetBooksData_books_author__asPerson,
-        GBookFragment_author__asPerson,
-        GAuthorFragment__asPerson,
         GGetBooksData_books__base_author {
   GGetBooksData_books__base_author__asPerson._();
 
@@ -274,9 +271,7 @@ abstract class GGetBooksData_books__base_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GGetBooksData_books__base_author__asPerson>
       get serializer => _$gGetBooksDataBooksBaseAuthorAsPersonSerializer;
@@ -301,9 +296,6 @@ abstract class GGetBooksData_books__base_author__asCompany
         GGetBooksData_books_author,
         GBookFragment_author,
         GAuthorFragment,
-        GGetBooksData_books_author__asCompany,
-        GBookFragment_author__asCompany,
-        GAuthorFragment__asCompany,
         GGetBooksData_books__base_author {
   GGetBooksData_books__base_author__asCompany._();
 
@@ -320,7 +312,6 @@ abstract class GGetBooksData_books__base_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GGetBooksData_books__base_author__asCompany>
       get serializer => _$gGetBooksDataBooksBaseAuthorAsCompanySerializer;
@@ -499,11 +490,6 @@ abstract class GGetBooksData_books__asTextbook_author__asPerson
         GBookFragment__asTextbook_author,
         GGetBooksData_books_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GBookFragment,
-        GBookFragment__asPerson,
-        GGetBooksData_books_author__asPerson,
-        GAuthorFragment__asPerson,
         GGetBooksData_books__asTextbook_author {
   GGetBooksData_books__asTextbook_author__asPerson._();
 
@@ -520,9 +506,7 @@ abstract class GGetBooksData_books__asTextbook_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GGetBooksData_books__asTextbook_author__asPerson>
       get serializer => _$gGetBooksDataBooksAsTextbookAuthorAsPersonSerializer;
@@ -548,11 +532,6 @@ abstract class GGetBooksData_books__asTextbook_author__asCompany
         GBookFragment__asTextbook_author,
         GGetBooksData_books_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GBookFragment,
-        GBookFragment__asCompany,
-        GGetBooksData_books_author__asCompany,
-        GAuthorFragment__asCompany,
         GGetBooksData_books__asTextbook_author {
   GGetBooksData_books__asTextbook_author__asCompany._();
 
@@ -569,7 +548,6 @@ abstract class GGetBooksData_books__asTextbook_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GGetBooksData_books__asTextbook_author__asCompany>
       get serializer => _$gGetBooksDataBooksAsTextbookAuthorAsCompanySerializer;
@@ -752,11 +730,6 @@ abstract class GGetBooksData_books__asColoringBook_author__asPerson
         GBookFragment__asColoringBook_author,
         GGetBooksData_books_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GBookFragment,
-        GBookFragment__asPerson,
-        GGetBooksData_books_author__asPerson,
-        GAuthorFragment__asPerson,
         GGetBooksData_books__asColoringBook_author {
   GGetBooksData_books__asColoringBook_author__asPerson._();
 
@@ -774,9 +747,7 @@ abstract class GGetBooksData_books__asColoringBook_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GGetBooksData_books__asColoringBook_author__asPerson>
       get serializer =>
@@ -803,11 +774,6 @@ abstract class GGetBooksData_books__asColoringBook_author__asCompany
         GBookFragment__asColoringBook_author,
         GGetBooksData_books_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GBookFragment,
-        GBookFragment__asCompany,
-        GGetBooksData_books_author__asCompany,
-        GAuthorFragment__asCompany,
         GGetBooksData_books__asColoringBook_author {
   GGetBooksData_books__asColoringBook_author__asCompany._();
 
@@ -825,7 +791,6 @@ abstract class GGetBooksData_books__asColoringBook_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GGetBooksData_books__asColoringBook_author__asCompany>
       get serializer =>
@@ -901,7 +866,6 @@ abstract class GGetBooksData_books_author__asPerson
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
         GAuthorFragment__asPerson,
         GGetBooksData_books_author {
   @override
@@ -918,7 +882,6 @@ abstract class GGetBooksData_books_author__asCompany
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
         GAuthorFragment__asCompany,
         GGetBooksData_books_author {
   @override
@@ -1277,16 +1240,12 @@ abstract class GBookFragment__base_author__asPerson
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragment__base_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
 }
 
@@ -1294,14 +1253,11 @@ abstract class GBookFragment__base_author__asCompany
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragment__base_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
 }
 
@@ -1372,16 +1328,12 @@ abstract class GBookFragment__asTextbook_author__asPerson
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragment__asTextbook_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
 }
 
@@ -1389,14 +1341,11 @@ abstract class GBookFragment__asTextbook_author__asCompany
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragment__asTextbook_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
 }
 
@@ -1469,16 +1418,12 @@ abstract class GBookFragment__asColoringBook_author__asPerson
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragment__asColoringBook_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
 }
 
@@ -1486,14 +1431,11 @@ abstract class GBookFragment__asColoringBook_author__asCompany
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragment__asColoringBook_author {
   @override
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
 }
 
@@ -1786,8 +1728,6 @@ abstract class GBookFragmentData__base_author__asPerson
             GBookFragmentData__base_author__asPersonBuilder>,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragmentData_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragmentData__base_author {
   GBookFragmentData__base_author__asPerson._();
 
@@ -1804,9 +1744,7 @@ abstract class GBookFragmentData__base_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GBookFragmentData__base_author__asPerson> get serializer =>
       _$gBookFragmentDataBaseAuthorAsPersonSerializer;
@@ -1830,8 +1768,6 @@ abstract class GBookFragmentData__base_author__asCompany
             GBookFragmentData__base_author__asCompanyBuilder>,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragmentData_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragmentData__base_author {
   GBookFragmentData__base_author__asCompany._();
 
@@ -1848,7 +1784,6 @@ abstract class GBookFragmentData__base_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GBookFragmentData__base_author__asCompany> get serializer =>
       _$gBookFragmentDataBaseAuthorAsCompanySerializer;
@@ -2024,11 +1959,6 @@ abstract class GBookFragmentData__asTextbook_author__asPerson
         GBookFragment__asTextbook_author,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GBookFragment,
-        GBookFragment__asPerson,
-        GBookFragmentData_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragmentData__asTextbook_author {
   GBookFragmentData__asTextbook_author__asPerson._();
 
@@ -2045,9 +1975,7 @@ abstract class GBookFragmentData__asTextbook_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GBookFragmentData__asTextbook_author__asPerson>
       get serializer => _$gBookFragmentDataAsTextbookAuthorAsPersonSerializer;
@@ -2073,11 +2001,6 @@ abstract class GBookFragmentData__asTextbook_author__asCompany
         GBookFragment__asTextbook_author,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GBookFragment,
-        GBookFragment__asCompany,
-        GBookFragmentData_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragmentData__asTextbook_author {
   GBookFragmentData__asTextbook_author__asCompany._();
 
@@ -2094,7 +2017,6 @@ abstract class GBookFragmentData__asTextbook_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GBookFragmentData__asTextbook_author__asCompany>
       get serializer => _$gBookFragmentDataAsTextbookAuthorAsCompanySerializer;
@@ -2275,11 +2197,6 @@ abstract class GBookFragmentData__asColoringBook_author__asPerson
         GBookFragment__asColoringBook_author,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
-        GBookFragment,
-        GBookFragment__asPerson,
-        GBookFragmentData_author__asPerson,
-        GAuthorFragment__asPerson,
         GBookFragmentData__asColoringBook_author {
   GBookFragmentData__asColoringBook_author__asPerson._();
 
@@ -2297,9 +2214,7 @@ abstract class GBookFragmentData__asColoringBook_author__asPerson
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get firstName;
-  @override
   String get lastName;
   static Serializer<GBookFragmentData__asColoringBook_author__asPerson>
       get serializer =>
@@ -2326,11 +2241,6 @@ abstract class GBookFragmentData__asColoringBook_author__asCompany
         GBookFragment__asColoringBook_author,
         GBookFragmentData_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
-        GBookFragment,
-        GBookFragment__asCompany,
-        GBookFragmentData_author__asCompany,
-        GAuthorFragment__asCompany,
         GBookFragmentData__asColoringBook_author {
   GBookFragmentData__asColoringBook_author__asCompany._();
 
@@ -2348,7 +2258,6 @@ abstract class GBookFragmentData__asColoringBook_author__asCompany
   String get G__typename;
   @override
   String get displayName;
-  @override
   String get name;
   static Serializer<GBookFragmentData__asColoringBook_author__asCompany>
       get serializer =>
@@ -2423,7 +2332,6 @@ abstract class GBookFragmentData_author__asPerson
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asPerson,
         GAuthorFragment__asPerson,
         GBookFragmentData_author {
   @override
@@ -2440,7 +2348,6 @@ abstract class GBookFragmentData_author__asCompany
     implements
         GBookFragment_author,
         GAuthorFragment,
-        GBookFragment_author__asCompany,
         GAuthorFragment__asCompany,
         GBookFragmentData_author {
   @override

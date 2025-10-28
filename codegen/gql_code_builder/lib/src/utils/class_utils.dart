@@ -4,6 +4,7 @@ import "package:gql_code_builder/source.dart";
 import "package:gql_code_builder/src/built_class.dart";
 import "package:gql_code_builder/src/common.dart";
 import "package:gql_code_builder/src/config/when_extension_config.dart";
+import "package:gql_code_builder/src/fragment_inline_info.dart";
 import "package:gql_code_builder/src/inline_fragment_classes.dart";
 
 import "../operation/data.dart";
@@ -37,8 +38,19 @@ List<Spec> buildOutputClasses(
   Map<String, Reference> typeOverrides,
   Map<String, SourceSelections> fragmentMap,
   InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 ) {
-  if (inlineFragments.isNotEmpty) {
+  // Check if we need to build inline fragment classes
+  // This is true if:
+  // 1. There are direct inline fragments, OR
+  // 2. There are spread fragments that contain inline fragments
+  final hasInlineFragments = inlineFragments.isNotEmpty;
+  final hasSpreadFragmentsWithInlineFragments =
+      fragmentInlineFragmentInfo != null &&
+          nestedSuperclassSelections.keys.any((superName) =>
+              fragmentInlineFragmentInfo.hasInlineFragments(superName));
+
+  if (hasInlineFragments || hasSpreadFragmentsWithInlineFragments) {
     return _buildClassesWithInlineFragments(
       name: name,
       fieldGetters: fieldGetters,
@@ -53,6 +65,7 @@ List<Spec> buildOutputClasses(
       inlineFragments: inlineFragments,
       built: built,
       whenExtensionConfig: whenExtensionConfig,
+      fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
     );
   } else if (!built && dataClassAliasMap[name] == null) {
     return [
@@ -94,6 +107,7 @@ List<Spec> _buildClassesWithInlineFragments({
   required List<InlineFragmentNode> inlineFragments,
   required bool built,
   required InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 }) =>
     buildInlineFragmentClasses(
       name: name,
@@ -109,6 +123,7 @@ List<Spec> _buildClassesWithInlineFragments({
       inlineFragments: inlineFragments,
       built: built,
       whenExtensionConfig: whenExtensionConfig,
+      fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
     );
 
 /// Builds an interface class for abstract representations.
@@ -197,6 +212,7 @@ List<Spec> buildNestedFieldClasses(
   List<InlineFragmentNode> inlineFragments,
   String? parentFragmentPath,
   String? fragmentTypeName,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 ) {
   // Track fragment sources to detect shared structures
   final fragmentSources = <String, String>{};
@@ -255,7 +271,8 @@ List<Spec> buildNestedFieldClasses(
         whenExtensionConfig: whenExtensionConfig,
         inlineFragments: inlineFragments,
         parentFragmentPath: parentFragmentPath,
-        fragmentDeduplicationMap: fragmentDeduplicationMap));
+        fragmentDeduplicationMap: fragmentDeduplicationMap,
+        fragmentInlineFragmentInfo: fragmentInlineFragmentInfo));
   }
 
   return result;
@@ -292,6 +309,7 @@ List<Spec> _buildNestedFieldClass({
   required String? parentFragmentPath,
   required Map<String, String> fragmentDeduplicationMap,
   String? fragmentTypeName,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 }) {
   final fieldName = field.alias?.value ?? field.name.value;
   final fieldClassName = "${name}_$fieldName";
@@ -335,5 +353,6 @@ List<Spec> _buildNestedFieldClass({
     built: inlineFragments.isNotEmpty ? false : built,
     whenExtensionConfig: whenExtensionConfig,
     parentFragmentPath: currentFragmentPath,
+    fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
   );
 }

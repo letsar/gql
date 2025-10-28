@@ -3,6 +3,7 @@ import "package:gql/ast.dart";
 import "package:gql_code_builder/source.dart";
 import "package:gql_code_builder/src/common.dart";
 import "package:gql_code_builder/src/config/when_extension_config.dart";
+import "package:gql_code_builder/src/fragment_inline_info.dart";
 
 import "../utils/class_utils.dart";
 import "../utils/field_utils.dart";
@@ -36,6 +37,7 @@ List<Spec> buildSelectionSetDataClasses({
   List<InlineFragmentNode>? parentInlineFragments,
   Map<String, String>? typeMap,
   String? parentFragmentPath,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 }) {
   // Process superclass selections and fragment spreads
   final nestedSuperclassSelections = processSuperclassSelections(
@@ -80,6 +82,7 @@ List<Spec> buildSelectionSetDataClasses({
     typeOverrides,
     fragmentMap,
     whenExtensionConfig,
+    fragmentInlineFragmentInfo,
   );
 
   // Build classes for nested fields
@@ -98,6 +101,7 @@ List<Spec> buildSelectionSetDataClasses({
     inlineFragments,
     parentFragmentPath,
     fragmentTypeName,
+    fragmentInlineFragmentInfo,
   ));
 
   return result;

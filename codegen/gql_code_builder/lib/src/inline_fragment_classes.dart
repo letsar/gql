@@ -1,6 +1,7 @@
 import "package:code_builder/code_builder.dart";
 import "package:gql/ast.dart";
 import "package:gql_code_builder/src/config/when_extension_config.dart";
+import "package:gql_code_builder/src/fragment_inline_info.dart";
 import "package:gql_code_builder/src/when_extension.dart";
 
 import "../source.dart";
@@ -74,12 +75,33 @@ List<Spec> buildInlineFragmentClasses({
   required List<InlineFragmentNode> inlineFragments,
   required bool built,
   required InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 }) {
   // Validate all fragment types exist in schema
   validateFragmentTypes(inlineFragments, schemaSource.document);
 
   // Create mapping of GraphQL type names to generated class names
   final typeMap = buildInlineFragmentTypeMap(name, inlineFragments);
+
+  // IMPORTANT: Collect all fragment types that need to be handled
+  // This includes types from direct inline fragments AND types from spread fragments
+  final allFragmentTypeNames = <String>{};
+
+  // Add types from direct inline fragments
+  for (final inlineFragment in inlineFragments) {
+    if (inlineFragment.typeCondition != null) {
+      allFragmentTypeNames.add(inlineFragment.typeCondition!.on.name.value);
+    }
+  }
+
+  // Add types from spread fragments that have inline fragments
+  if (fragmentInlineFragmentInfo != null) {
+    for (final superName in superclassSelections.keys) {
+      final types =
+          fragmentInlineFragmentInfo.getInlineFragmentTypes(superName);
+      allFragmentTypeNames.addAll(types);
+    }
+  }
 
   // Filter out inline fragments for the base class
   final baseClassSelections =
@@ -141,6 +163,7 @@ List<Spec> buildInlineFragmentClasses({
       built: built,
       whenExtensionConfig: whenExtensionConfig,
       typeMap: typeMap,
+      fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
     ),
   ];
 
@@ -288,6 +311,7 @@ List<Spec> _buildTypeSpecificClasses({
   required bool built,
   required InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
   required Map<String, String> typeMap,
+  FragmentInlineFragmentInfo? fragmentInlineFragmentInfo,
 }) {
   final List<Spec> result = [];
   final context = _InterfaceContext();
@@ -298,34 +322,76 @@ List<Spec> _buildTypeSpecificClasses({
     context.addInterface(superName);
   }
 
-  // Process fragments with type conditions
-  for (final inlineFragment in inlineFragments.where((frag) =>
-      frag.typeCondition != null &&
-      !dataClassAliasMap.containsKey(builtClassName(
-          context.specialize(baseName, frag.typeCondition!.on.name.value))))) {
-    final fragmentTypeName = inlineFragment.typeCondition!.on.name.value;
+  // Collect all type names for which we need to create specialized classes
+  // This includes:
+  // 1. Types from direct inline fragments
+  // 2. Types from inline fragments within spread fragments
+  final allFragmentTypeNames = <String>{};
+
+  // Add types from direct inline fragments
+  for (final inlineFragment in inlineFragments) {
+    if (inlineFragment.typeCondition != null) {
+      allFragmentTypeNames.add(inlineFragment.typeCondition!.on.name.value);
+    }
+  }
+
+  // Add types from inline fragments in spread fragments
+  if (fragmentInlineFragmentInfo != null) {
+    for (final superName in superclassSelections.keys) {
+      // Check if this superclass is a fragment that has inline fragments
+      final typesForFragment =
+          fragmentInlineFragmentInfo.getInlineFragmentTypes(superName);
+      allFragmentTypeNames.addAll(typesForFragment);
+    }
+  }
+
+  // Process each fragment type
+  for (final fragmentTypeName in allFragmentTypeNames) {
+    // Skip if already aliased
+    if (dataClassAliasMap.containsKey(
+        builtClassName(context.specialize(baseName, fragmentTypeName)))) {
+      continue;
+    }
+
+    // Find the corresponding inline fragment node (if it exists at this level)
+    final inlineFragment = inlineFragments.firstWhere(
+      (frag) => frag.typeCondition?.on.name.value == fragmentTypeName,
+      orElse: () => InlineFragmentNode(
+        typeCondition: null, // Will use empty selections
+        selectionSet: SelectionSetNode(selections: const []),
+      ),
+    );
+
     final fragmentClassName = "${name}__as$fragmentTypeName";
 
-    // Initialize expanded selections with original superclass selections
-    final expandedSuperclassSelections = {...superclassSelections};
+    // Start with a copy of the superclass selections
+    final expandedSuperclassSelections = <String, SourceSelections>{
+      ...superclassSelections
+    };
+
     final nestedInterfaceMap = <String, String>{};
 
-    // Process each base interface found in the hierarchy
+    // Process each base interface found in the hierarchy that is also in superclassSelections
+    // We only process interfaces that are relevant to this level (i.e., in superclassSelections)
     for (final baseInterfaceName in context.hierarchy.keys) {
+      // IMPORTANT: Only process this interface if it's in superclassSelections
+      // This ensures we don't add interfaces from parent levels.
+      if (!superclassSelections.containsKey(baseInterfaceName)) {
+        continue;
+      }
+
       final specializedName =
           context.specialize(baseInterfaceName, fragmentTypeName);
 
-      // Add base interface selection if not already present
-      if (!expandedSuperclassSelections.containsKey(baseInterfaceName)) {
-        expandedSuperclassSelections[baseInterfaceName] =
-            superclassSelections[baseInterfaceName] ??
-                SourceSelections(url: null, selections: selections);
-      }
-
-      // Process specialized interfaces if the current fragment matches the type condition
-      final hasSpecializedInterface = inlineFragments.any((f) =>
-          f.typeCondition != null &&
-          f.typeCondition!.on.name.value == fragmentTypeName);
+      // Determine if we should create a specialized interface:
+      //
+      // Use fragmentInlineFragmentInfo to check if the
+      // baseInterface fragment actually HAS inline fragments for this type.
+      final hasSpecializedInterface = fragmentInlineFragmentInfo != null &&
+          fragmentInlineFragmentInfo.hasInlineFragmentForType(
+            baseInterfaceName,
+            fragmentTypeName,
+          );
 
       if (hasSpecializedInterface) {
         // Track specialized interface names
@@ -347,18 +413,34 @@ List<Spec> _buildTypeSpecificClasses({
           final nestedSpecializedName =
               context.specialize(nestedBaseName, fragmentTypeName);
 
-          // Add selections for nested specialized interfaces
-          expandedSuperclassSelections[nestedSpecializedName] =
-              SourceSelections(
-            url: superclassSelections[specializedInterface]?.url,
-            selections: [
-              ...superclassSelections[specializedInterface]?.selections ?? [],
-              ...inlineFragment.selectionSet.selections,
-            ],
+          // IMPORTANT: Check if the nested interface should be specialized
+          // Only create specialized versions if the fragment actually has inline fragments for this type
+          final shouldSpecializeNested =
+              fragmentInlineFragmentInfo.hasInlineFragmentForType(
+            nestedBaseName,
+            fragmentTypeName,
           );
 
-          // Map nested interfaces
-          nestedInterfaceMap[specializedInterface] = nestedSpecializedName;
+          if (shouldSpecializeNested) {
+            // Add selections for nested specialized interfaces
+            expandedSuperclassSelections[nestedSpecializedName] =
+                SourceSelections(
+              url: superclassSelections[specializedInterface]?.url,
+              selections: [
+                ...superclassSelections[specializedInterface]?.selections ?? [],
+                ...inlineFragment.selectionSet.selections,
+              ],
+            );
+
+            // Map nested interfaces
+            nestedInterfaceMap[specializedInterface] = nestedSpecializedName;
+          } else {
+            // Keep the original nested interface without specialization
+            if (superclassSelections.containsKey(specializedInterface)) {
+              expandedSuperclassSelections[specializedInterface] =
+                  superclassSelections[specializedInterface]!;
+            }
+          }
         }
       }
     }

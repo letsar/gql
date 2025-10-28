@@ -2,6 +2,7 @@ import "package:code_builder/code_builder.dart";
 import "package:gql/ast.dart";
 import "package:gql_code_builder/source.dart";
 import "package:gql_code_builder/src/config/when_extension_config.dart";
+import "package:gql_code_builder/src/fragment_inline_info.dart";
 
 import "../common.dart";
 import "../utils/selection_utils.dart";
@@ -34,6 +35,7 @@ List<Spec> buildOperationDataClasses(
   InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
   Map<String, SourceSelections> fragmentMap,
   Map<String, Reference> dataClassAliasMap,
+  FragmentInlineFragmentInfo fragmentInlineFragmentInfo,
 ) {
   if (op.name == null) {
     throw Exception("Operations must be named");
@@ -58,5 +60,6 @@ List<Spec> buildOperationDataClasses(
     dataClassAliasMap: dataClassAliasMap,
     superclassSelections: {},
     whenExtensionConfig: whenExtensionConfig,
+    fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
   );
 }

@@ -4,6 +4,7 @@ import "package:gql_code_builder/source.dart";
 import "package:gql_code_builder/src/config/when_extension_config.dart";
 
 import "../common.dart";
+import "../fragment_inline_info.dart";
 import "../utils/selection_utils.dart";
 import "selection_builder.dart";
 
@@ -32,6 +33,7 @@ List<Spec> buildFragmentDataClasses(
   InlineFragmentSpreadWhenExtensionConfig whenExtensionConfig,
   Map<String, SourceSelections> fragmentMap,
   Map<String, Reference> dataClassAliasMap,
+  FragmentInlineFragmentInfo fragmentInlineFragmentInfo,
 ) {
   final selections = mergeSelections(
     frag.selectionSet.selections,
@@ -52,6 +54,7 @@ List<Spec> buildFragmentDataClasses(
       superclassSelections: {},
       built: false,
       whenExtensionConfig: whenExtensionConfig,
+      fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
     ),
     // concrete built_value data class for fragment
     ...buildSelectionSetDataClasses(
@@ -70,6 +73,61 @@ List<Spec> buildFragmentDataClasses(
         )
       },
       whenExtensionConfig: whenExtensionConfig,
+      fragmentInlineFragmentInfo: fragmentInlineFragmentInfo,
     ),
   ];
+}
+
+/// Analyzes a GraphQL document to track which fragments define inline fragments.
+///
+/// This function scans all fragment definitions in the document and identifies
+/// which fragments have DIRECT inline fragments (not nested through spreads).
+///
+/// For example, given:
+/// ```graphql
+/// fragment AuthorFragment on Author {
+///   displayName
+///   ... on Person {      # <- DIRECT inline fragment
+///     firstName
+///   }
+/// }
+///
+/// fragment BookFragment on Book {
+///   author {
+///     ...AuthorFragment  # <- Fragment spread, NOT an inline fragment
+///   }
+/// }
+/// ```
+///
+/// This will record that:
+/// - AuthorFragment HAS inline fragments for "Person"
+/// - BookFragment does NOT have inline fragments
+///
+/// Returns a [FragmentInlineFragmentInfo] that can be used during code generation
+/// to decide which specialized interfaces to create.
+FragmentInlineFragmentInfo analyzeFragmentInlineFragments(
+  DocumentNode document,
+  Map<String, SourceSelections> fragmentMap,
+) {
+  final info = FragmentInlineFragmentInfo();
+
+  // Scan all definitions in the document
+  for (final definition in document.definitions) {
+    if (definition is FragmentDefinitionNode) {
+      final fragmentName = definition.name.value;
+
+      // Look for DIRECT inline fragments in this fragment's selection set
+      // (not nested through fragment spreads)
+      for (final selection in definition.selectionSet.selections) {
+        if (selection is InlineFragmentNode) {
+          final typeName = selection.typeCondition?.on.name.value;
+          if (typeName != null) {
+            info.addInlineFragment(fragmentName, typeName);
+          }
+        }
+      }
+    }
+  }
+
+  return info;
 }

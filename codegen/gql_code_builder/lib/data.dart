@@ -30,6 +30,13 @@ Library buildDataLibrary(
       ? _dataClassAliasMap(docSource, fragmentMap)
       : <String, Reference>{};
 
+  // Analyze which fragments have inline fragments
+  // This is used to determine which specialized interfaces to create
+  final fragmentInlineFragmentInfo = analyzeFragmentInlineFragments(
+    docSource.document,
+    fragmentMap,
+  );
+
   final operationDataClasses = docSource.document.definitions
       .whereType<OperationDefinitionNode>()
       .expand(
@@ -41,6 +48,7 @@ Library buildDataLibrary(
           whenExtensionConfig,
           fragmentMap,
           dataClassAliasMap,
+          fragmentInlineFragmentInfo,
         ),
       )
       .toList();
@@ -56,6 +64,7 @@ Library buildDataLibrary(
           whenExtensionConfig,
           fragmentMap,
           dataClassAliasMap,
+          fragmentInlineFragmentInfo,
         ),
       )
       .toList();
